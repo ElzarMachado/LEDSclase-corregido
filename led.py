@@ -56,21 +56,19 @@ class HomeLightingApp:
 
         for room in self.lights:
             color = self.color_on if self.lights[room] else self.color_off
-
             button_text = f"{room} {'ON' if self.lights[room] else 'OFF'}"
             button = tk.Button(self.button_frame, text=button_text, width=10, command=lambda r=room: self.toggle_light(r), fg=color)
             button.pack(side="left", padx=10)
             self.room_buttons[room] = button
 
-        button_all = tk.Button(self.button_frame, text="Todos", width=10, command=self.toggle_all_lights)
-        button_all.pack(side="left", padx=10)
+        self.button_all = tk.Button(self.button_frame, text="Todos", width=10, command=self.toggle_all_lights)
+        self.button_all.pack(side="left", padx=10)
 
         button_exit = tk.Button(self.button_frame, text="Salir", width=10, command=self.root.destroy)
         button_exit.pack(side="left", padx=10)
 
     def toggle_light(self, room):
         self.lights[room] = not self.lights[room]  
-
         self.draw_lights()
 
         if room in self.room_buttons:
@@ -79,9 +77,21 @@ class HomeLightingApp:
 
     def toggle_all_lights(self):
         all_on = all(self.lights.values())
+        new_state = not all_on
+
         for room in self.lights:
-            self.lights[room] = not all_on
-        self.draw_lights() 
+            self.lights[room] = new_state
+
+        self.draw_lights()
+
+        for room in self.room_buttons:
+            color = self.color_on if self.lights[room] else self.color_off
+            self.room_buttons[room].config(text=f"{room} {'ON' if self.lights[room] else 'OFF'}", fg=color)
+
+        if new_state:
+            self.button_all.config(text="Todos ON", fg=self.color_on)
+        else:
+            self.button_all.config(text="Todos OFF", fg=self.color_off)
 
 if __name__ == "__main__":
     root = tk.Tk()
